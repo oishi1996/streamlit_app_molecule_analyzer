@@ -1,9 +1,15 @@
+import os
 import streamlit as st
-from utils.model_utils import load_model, predict_pka
 from streamlit_ketcher import st_ketcher
+from dotenv import load_dotenv
+from utils import model_utils
+load_dotenv(os.path.join(os.path.dirname(__file__), ".", ".env"))
 
 # モデルのロード
-model = load_model()
+model_path = os.getenv("MODEL_PATH")
+if not model_path:
+    raise ValueError("MODEL_PATH is not set in the environment variables.")
+model = model_utils.load_model(model_path)
 
 # Streamlit UI
 st.title(":material/Science: pKa Predictor")
@@ -17,16 +23,8 @@ with st.container():
     smiles = st_ketcher()
 
     if smiles:
-        predicted_pka = predict_pka(smiles, model)
+        predicted_pka = model_utils.predict_pka(smiles, model)
         st.success(f"**Generated SMILES:** `{smiles}`")
         st.success(f"Predicted pKa: {predicted_pka:.2f}")
     else:
         st.warning("No molecule detected. Please draw a structure.")
-
-
-# smiles_input = st_ketcher()
-
-# # 予測ボタン
-# if st.button("🔍 予測"):
-#     predicted_pka = predict_pka(smiles_input, model)
-#     st.success(f"Predicted pKa: {predicted_pka:.2f}")

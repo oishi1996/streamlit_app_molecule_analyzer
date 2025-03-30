@@ -3,7 +3,7 @@ import pandas as pd
 from utils.descriptor_utils import descriptor_names, canonicalize_smiles, compute_all_descriptors
 
 # 学習済みモデルのロード
-def load_model(model_path="model.pkl"):
+def load_model(model_path):
     return joblib.load(model_path)
 
 # pKa 予測関数
