@@ -22,7 +22,7 @@ Base = declarative_base()
 
 def create_tables():
     """テーブル作成"""
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine, checkfirst=True)
 
 
 @contextmanager
