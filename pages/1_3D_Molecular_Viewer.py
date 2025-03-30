@@ -1,29 +1,7 @@
 import streamlit as st
-import py3Dmol
-from rdkit import Chem
-from rdkit.Chem import AllChem
 from stmol import showmol
 from streamlit_ketcher import st_ketcher
-
-# 3D分子構造を取得する関数
-def get_optimized_3Dmol(smiles, view_style):
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        return None, None  # SMILES のパースに失敗した場合
-
-    mol = Chem.AddHs(mol, addCoords=True)
-    try:
-        AllChem.EmbedMolecule(mol, AllChem.ETKDG())  # 3D座標生成
-        AllChem.MMFFOptimizeMoleculeConfs(mol)  # 力場最適化
-    except Exception as e:
-        st.error(f"3D構造の最適化に失敗しました: {e}")
-        return None, None
-    
-    target_sdf = Chem.MolToMolBlock(mol)
-
-    view = py3Dmol.view(data=target_sdf)
-    view.setStyle({view_style: {}})
-    return mol, view
+from utils import molecule_handler
 
 # Streamlit UI
 st.title(":material/Science: 3D Molecular Viewer")
@@ -46,10 +24,10 @@ else:
 view_style = st.selectbox("Select a view style:", ["stick", "line", "sphere"])
 
 if smiles:
-    mol, view = get_optimized_3Dmol(smiles, view_style)
+    mol, view = molecule_handler.get_optimized_3Dmol(smiles, view_style)
     if mol:
+        st.success("3D structure generated successfully.")
         showmol(view, height=500, width=800)
-        st.text("3D structure generated successfully.")
     else:
         st.error("3D structure generation failed. Please check the SMILES string.")
 
