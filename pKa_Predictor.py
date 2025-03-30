@@ -19,7 +19,8 @@ model = model_utils.load_model(model_path)
 st.title(":material/Science: pKa Predictor")
 st.markdown("""
             - This app allows you to draw chemical structures and predict their pKa values
-            - Draw your molecule below...
+            - (1). **Draw** molecule below
+            - (2). **Click** the **Apply** button to predict pKa value
             """)
 
 
