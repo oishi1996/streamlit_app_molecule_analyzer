@@ -1,23 +1,44 @@
+from typing import Optional, List
 from rdkit import Chem
 from rdkit.Chem import Descriptors
 from rdkit.Chem import Draw
+from PIL.Image import Image
+import logging
 
-# 記述子リスト
-descriptor_names = [desc[0] for desc in Descriptors.descList]
+descriptor_names: List[str] = [desc[0] for desc in Descriptors.descList]
 
-# カノニカル SMILES に変換
-def canonicalize_smiles(smiles):
-    mol = Chem.MolFromSmiles(smiles)
-    return Chem.MolToSmiles(mol, canonical=True) if mol else None
+def canonicalize_smiles(smiles: str) -> Optional[str]:
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            logging.warning(f"Invalid SMILES: {smiles}")
+            return None
+        return Chem.MolToSmiles(mol, canonical=True)
+    except Exception as e:
+        logging.error(f"Failed to canonicalize SMILES: {smiles}, Error: {e}")
+        return None
 
-# 記述子計算
-def compute_all_descriptors(smiles):
-    mol = Chem.MolFromSmiles(smiles)
-    return [getattr(Descriptors, desc)(mol) for desc in descriptor_names] if mol else None
 
-def smiles_to_image(smiles):
-    mol = Chem.MolFromSmiles(smiles)
-    if mol:
-        img = Draw.MolToImage(mol, size=(100, 100))
+def compute_all_descriptors(smiles: str) -> Optional[List[float]]:
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            logging.warning(f"Invalid SMILES for descriptor calculation: {smiles}")
+            return None
+        return [getattr(Descriptors, desc)(mol) for desc in descriptor_names]
+    except Exception as e:
+        logging.error(f"Descriptor calculation failed for SMILES: {smiles}, Error: {e}")
+        return None
+
+
+def smiles_to_image(smiles: str, size: tuple = (100, 100)) -> Optional[Image]:
+    try:
+        mol = Chem.MolFromSmiles(smiles)
+        if mol is None:
+            logging.warning(f"Invalid SMILES for image generation: {smiles}")
+            return None
+        img = Draw.MolToImage(mol, size=size)
         return img
-    return None
+    except Exception as e:
+        logging.error(f"Failed to generate image for SMILES: {smiles}, Error: {e}")
+        return None

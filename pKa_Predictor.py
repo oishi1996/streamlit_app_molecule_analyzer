@@ -1,5 +1,4 @@
 import os
-import logging
 import streamlit as st
 from streamlit_ketcher import st_ketcher
 
@@ -15,7 +14,6 @@ model_path = os.getenv("MODEL_PATH")
 if not model_path:
     raise ValueError("MODEL_PATH is not set in the environment variables.")
 model = model_utils.load_model(model_path)
-logging.info(f"Loading model from: {model_path}")
 
 # Streamlit UI
 st.title(":material/Science: pKa Predictor")
@@ -30,20 +28,23 @@ with st.container():
 
     if smiles:
         st.success(f"**Generated SMILES:** `{smiles}`")
-        logging.info(f"SMILES input: {smiles}")
         with st.spinner("Predicting pKa..."):
             predicted_pka = model_utils.predict_pka(smiles, model)
-        st.success(f"**Predicted pKa:** {predicted_pka:.2f}")
-        logging.info(f"Predicted pKa for {smiles}: {predicted_pka:.2f}")
-        
-        #データベースに保存
-        with get_db_session() as db:
-            new_pkadata = PkaData(smiles=smiles, predicted_pka=predicted_pka)
-            db.add(new_pkadata)
-            db.commit()
-            db.refresh(new_pkadata)
-            st.toast("successfuly saved pKa", icon="🎉")
-            logging.info(f"Saving to DB: {smiles}, pKa={predicted_pka}")
+
+        if predicted_pka:
+            st.success(f"**Predicted pKa:** {predicted_pka:.2f}")
+
+            #データベースに保存
+            with get_db_session() as db:
+                new_pkadata = PkaData(smiles=smiles, predicted_pka=predicted_pka)
+                db.add(new_pkadata)
+                db.commit()
+                db.refresh(new_pkadata)
+                st.toast("successfuly saved pKa", icon="🎉")
+
+        else:
+            st.error("Invalid SMILES. Please try again.")
+    
     else:
         st.warning("No molecule detected. Please draw a structure.")
 
