@@ -1,6 +1,6 @@
 import joblib
 import pandas as pd
-from utils.descriptor_utils import descriptor_names, canonicalize_smiles, compute_all_descriptors
+from utils.molecule_handler import descriptor_names, canonicalize_smiles, compute_all_descriptors
 
 # 学習済みモデルのロード
 def load_model(model_path):

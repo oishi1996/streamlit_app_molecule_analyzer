@@ -3,6 +3,6 @@
 .venv
 data
 train_model.py
-**/__pycache__
+**/__pycache__/
 *.log
-# model.pkl
+*.db
