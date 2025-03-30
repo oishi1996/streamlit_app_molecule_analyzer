@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import logging
 from dotenv import load_dotenv
 
 from database.database import create_tables
@@ -21,32 +22,20 @@ def initialize_setting():
         st.session_state.is_initialized = False
 
     if not st.session_state.is_initialized:
-        DATA_PATH = os.getenv("DATA_PATH")
-        DATA_RAW_PATH = os.path.join(DATA_PATH, "raw")
-        DATA_PROCESSED_PATH = os.path.join(DATA_PATH, "processed")
-        LOG_PATH = os.getenv("LOG_PATH")
+            # ログディレクトリ作成
+        log_path = os.getenv("LOG_PATH")
+        os.makedirs(log_path, exist_ok=True)
+        log_file = os.path.join(log_path, "app.log")
+        logging.basicConfig(
+            filename=log_file,
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+        )
 
-        if DATA_PATH and not os.path.exists(DATA_PATH):
-            os.makedirs(DATA_PATH)
-            os.makedirs(DATA_RAW_PATH)
-            os.makedirs(DATA_PROCESSED_PATH)
-            os.makedirs(LOG_PATH)
-
-            print(f"Directory created.")
-        else:
-            print(f"Directory already exists or DIR_PATH is not set in .env file.")
-
+        logging.info("Log file created at %s", log_file)
+        
+        # DB初期化
         create_tables()
-
-        # session_stateの設定
-        if "db_path" not in st.session_state:
-            st.session_state.db_path = os.getenv("DB_PATH")
-        if "data_raw_path" not in st.session_state:
-            st.session_state.data_raw_path = DATA_RAW_PATH
-        if "data_processed_path" not in st.session_state:
-            st.session_state.data_processed_path = DATA_PROCESSED_PATH
-        if "selected_id_list" not in st.session_state:
-            st.session_state.selected_id_list = []
 
         st.session_state.is_initialized = True
 
