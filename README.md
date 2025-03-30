@@ -2,3 +2,5 @@
 
 source .venv/bin/activate
 deactivate
+
+Python 3.11.9

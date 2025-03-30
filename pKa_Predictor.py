@@ -2,7 +2,9 @@ import os
 import streamlit as st
 from streamlit_ketcher import st_ketcher
 from dotenv import load_dotenv
+
 from utils import model_utils
+
 load_dotenv(os.path.join(os.path.dirname(__file__), ".", ".env"))
 
 # モデルのロード
@@ -23,8 +25,9 @@ with st.container():
     smiles = st_ketcher()
 
     if smiles:
-        predicted_pka = model_utils.predict_pka(smiles, model)
         st.success(f"**Generated SMILES:** `{smiles}`")
-        st.success(f"Predicted pKa: {predicted_pka:.2f}")
+        with st.spinner("Predicting pKa..."):
+            predicted_pka = model_utils.predict_pka(smiles, model)
+        st.success(f"**Predicted pKa:** {predicted_pka:.2f}")
     else:
         st.warning("No molecule detected. Please draw a structure.")
