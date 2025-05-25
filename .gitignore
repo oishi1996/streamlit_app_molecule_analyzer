@@ -6,3 +6,4 @@ train_model.py
 **/__pycache__/
 **.log
 *.db
+notebook
